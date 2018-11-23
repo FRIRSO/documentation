@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-deployment
+spec:
+  selector:
+    matchLabels:
+      app: orders
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      containers:
+      - image: gsas/rso-orders:latest
+        name: orders
+        env:
+          - name: KUMULUZEE_DISCOVERY_ETCD_HOSTS
+            value: http://etcd:2379
+          - name: KUMULUZEE_CONFIG_ETCD_HOSTS
+            value: http://etcd:2379
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+          name: server
+          protocol: TCP
+
+---
+          
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+spec:
+  type: LoadBalancer
+  ports:
+  - name: server
+    port: 8082
+    protocol: TCP
+    targetPort: 8082
+  selector:
+    app: orders
