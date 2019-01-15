@@ -16,6 +16,8 @@ spec:
       - image: gsas/rso-orders:latest
         name: orders
         env:
+          - name: KUMULUZEE_DISCOVERY_CLUSTER
+            value: azure
           - name: KUMULUZEE_DISCOVERY_ETCD_HOSTS
             value: http://etcd:2379
           - name: KUMULUZEE_CONFIG_ETCD_HOSTS
@@ -25,6 +27,12 @@ spec:
         - containerPort: 8082
           name: server
           protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: server
+          initialDelaySeconds: 120
+          periodSeconds: 20
 
 ---
           
